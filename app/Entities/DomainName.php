@@ -23,7 +23,7 @@ class DomainName
     protected $name;
 
     /**
-     * @ORM\Column(type="string", nullable=true)
+     * @ORM\Column(type="datetime", nullable=true)
      */
     protected $expiresAt;
 
@@ -52,7 +52,7 @@ class DomainName
     }
 
     /**
-     * @return string
+     * @return \DateTime
      */
     public function getExpiresAt()
     {
@@ -60,9 +60,9 @@ class DomainName
     }
 
     /**
-     * @param string $expiresAt
+     * @param \DateTime $expiresAt
      */
-    public function setExpiresAt($expiresAt): void
+    public function setExpiresAt(\DateTime $expiresAt): void
     {
         $this->expiresAt = $expiresAt;
     }

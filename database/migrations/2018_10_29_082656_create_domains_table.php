@@ -17,6 +17,7 @@ class CreateDomainsTable extends Migration
             $table->increments('id');
             $table->string('name')->unique();
             $table->timestamp('expires_at');
+            $table->timestamps();
         });
     }
 

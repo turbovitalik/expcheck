@@ -62,8 +62,7 @@ class ExportDomainsPool extends Command
      */
     public function handle()
     {
-        $downloadsDir = Storage::disk('local')->path('pool_downloads');
-        $filePath = $this->parser->findPoolFile($downloadsDir, new \DateTime());
+        $filePath = $this->parser->findPoolFile('pool_downloads', new \DateTime());
 
         if (!$filePath) {
             $this->info('File was not found');

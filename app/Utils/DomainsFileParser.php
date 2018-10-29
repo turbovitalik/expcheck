@@ -2,10 +2,24 @@
 
 namespace App\Utils;
 
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Contracts\Filesystem\Filesystem;
 
 class DomainsFileParser
 {
+    /**
+     * @var Filesystem
+     */
+    protected $storage;
+
+    /**
+     * DomainsFileParser constructor.
+     * @param Filesystem $storage
+     */
+    public function __construct(Filesystem $storage)
+    {
+        $this->storage = $storage;
+    }
+
     /**
      * @param $content
      * @return array
@@ -29,7 +43,7 @@ class DomainsFileParser
 
     public function loadFileContent($filePath)
     {
-        $contents = Storage::get($filePath);
+        $contents = $this->storage->get($filePath);
 
         return $contents;
     }
@@ -75,7 +89,7 @@ class DomainsFileParser
         $poolFileName = $datetime->format('m_d_Y') . '-pool/list.txt';
         $poolFilePath = $dir . '/' . $poolFileName;
 
-        if (!file_exists($poolFilePath)) {
+        if (!$this->storage->exists($poolFilePath)) {
             return false;
         }
 

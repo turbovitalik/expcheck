@@ -20,6 +20,7 @@
                                 <th>#</th>
                                 <th>Domain Name</th>
                                 <th>Expires</th>
+                                <th>Parsed</th>
                             </thead>
                             <tbody>
                             @foreach ($domains as $domain)
@@ -33,6 +34,9 @@
                                         @else
                                             {{ __('Undefined') }}
                                         @endif
+                                    </td>
+                                    <td>
+                                        {{ date_format($domain->getCreatedAt(), 'd-m-Y H:i:s') }}
                                     </td>
                                 </tr>
                             @endforeach

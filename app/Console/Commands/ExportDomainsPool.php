@@ -6,6 +6,7 @@ use App\Manager\DomainNameManager;
 use App\Repository\DomainRepository;
 use App\Utils\DomainsFileParser;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use LaravelDoctrine\ORM\Facades\EntityManager;
 
@@ -73,6 +74,8 @@ class ExportDomainsPool extends Command
         $bar = $this->output->createProgressBar(count($domainsParsed));
 
         $batchSize = 500;
+
+        DB::table('domains')->truncate();
 
         $i = 0;
         foreach ($domainsParsed as $domain) {

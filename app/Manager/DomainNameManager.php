@@ -36,17 +36,6 @@ class DomainNameManager
         return $domain;
     }
 
-    public function save(DomainName $domainName)
-    {
-        $oldDomain = $this->domainRepository->findByName($domainName->getName());
-
-        if ($oldDomain) {
-            $this->update($domainName, $oldDomain);
-        } else {
-            $this->insert();
-        }
-    }
-
     public function update(DomainName $domainName, DomainName $existedName)
     {
         $existedName->setExpiresAt($domainName->getExpiresAt());

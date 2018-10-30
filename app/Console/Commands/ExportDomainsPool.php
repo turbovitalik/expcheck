@@ -2,12 +2,11 @@
 
 namespace App\Console\Commands;
 
+use App\Entities\History;
 use App\Manager\DomainNameManager;
 use App\Repository\DomainRepository;
 use App\Utils\DomainsFileParser;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 use LaravelDoctrine\ORM\Facades\EntityManager;
 
 class ExportDomainsPool extends Command
@@ -32,14 +31,14 @@ class ExportDomainsPool extends Command
     protected $parser;
 
     /**
-     * @var DomainRepository
-     */
-    protected $domainRepository;
-
-    /**
      * @var DomainNameManager
      */
     protected $domainManager;
+
+    /**
+     * @var int
+     */
+    protected $batchSize = 500;
 
     /**
      * Create a new command instance.
@@ -48,11 +47,10 @@ class ExportDomainsPool extends Command
      * @param DomainRepository $domainRepository
      * @param DomainNameManager $domainManager
      */
-    public function __construct(DomainsFileParser $parser, DomainRepository $domainRepository, DomainNameManager $domainManager)
+    public function __construct(DomainsFileParser $parser, DomainNameManager $domainManager)
     {
         parent::__construct();
         $this->parser = $parser;
-        $this->domainRepository = $domainRepository;
         $this->domainManager = $domainManager;
     }
 
@@ -65,27 +63,39 @@ class ExportDomainsPool extends Command
     {
         $filePath = $this->parser->findPoolFile('pool_downloads', new \DateTime());
 
+        $historyRecord = new History();
+        $historyRecord->setFileName($filePath)->setStatus('Start');
+
         if (!$filePath) {
-            $this->info('File was not found');
+            $this->warn('File was not found. The domains database was not updated');
+            return false;
         }
 
+        $this->info('Start parsing file ' . $filePath);
         $domainsParsed = $this->parser->parse($filePath);
 
-        $bar = $this->output->createProgressBar(count($domainsParsed));
+        if ($domainsParsed) {
+            $this->info($domainsParsed . ' domains have been parsed. Saving them to DB...');
+            $this->saveToDB($domainsParsed);
+        }
+    }
 
-        $batchSize = 500;
+    /**
+     * @param $domains array
+     */
+    public function saveToDB($domains)
+    {
+        $progress = 0;
+        $bar = $this->output->createProgressBar(count($domains));
 
-        DB::table('domains')->truncate();
-
-        $i = 0;
-        foreach ($domainsParsed as $domain) {
-            $i++;
+        foreach ($domains as $domain) {
+            $progress++;
             $bar->advance();
 
             $domainEntity = $this->domainManager->createFromArray($domain);
             EntityManager::persist($domainEntity);
 
-            if (($i % $batchSize) == 0) {
+            if (($i % $this->batchSize) == 0) {
                 EntityManager::flush();
                 EntityManager::clear();
             }

@@ -73,8 +73,8 @@
                     @else
                         <a class="nav-link" href="{{ route('domains_list') }}">{{ __('Domains') }}</a>
                         <a class="nav-link" href="{{ route('parsing_info') }}">{{ __('Parsing') }}</a>
-                        <a href="{{ route('login') }}">Login</a>
-                        <a href="{{ route('register') }}">Register</a>
+                        {{--<a href="{{ route('login') }}">Login</a>--}}
+                        {{--<a href="{{ route('register') }}">Register</a>--}}
                     @endauth
                 </div>
             @endif

@@ -3,8 +3,10 @@
 namespace App\Providers;
 
 use App\Entities\DomainName;
+use App\Entities\History;
 use App\Repository\DoctrineDomainRepository;
 use App\Repository\DomainRepository;
+use App\Repository\HistoryRepository;
 use EntityManager;
 use Illuminate\Support\ServiceProvider;
 
@@ -35,6 +37,12 @@ class AppServiceProvider extends ServiceProvider
            return new DoctrineDomainRepository(
                EntityManager::getRepository(DomainName::class), $app['em']
            );
+        });
+
+        $this->app->bind(HistoryRepository::class, function($app) {
+            return new HistoryRepository(
+                EntityManager::getRepository(History::class)
+            );
         });
     }
 }

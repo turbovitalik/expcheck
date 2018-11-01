@@ -27,3 +27,6 @@ Route::post('/domains/upload/handle', 'DomainController@handleUpload')->name('do
 
 Route::get('/upload', 'UploadController@upload');
 
+Route::get('/parsing/info', 'ParsingController@info')->name('parsing_info');
+Route::get('/parsing/start', 'ParsingController@start')->name('parsing_start');
+

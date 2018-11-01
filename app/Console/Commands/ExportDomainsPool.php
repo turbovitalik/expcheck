@@ -7,6 +7,8 @@ use App\Manager\DomainNameManager;
 use App\Repository\DomainRepository;
 use App\Utils\DomainsFileParser;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use LaravelDoctrine\ORM\Facades\EntityManager;
 
 class ExportDomainsPool extends Command
@@ -64,20 +66,34 @@ class ExportDomainsPool extends Command
         $filePath = $this->parser->findPoolFile('pool_downloads', new \DateTime());
 
         $historyRecord = new History();
-        $historyRecord->setFileName($filePath)->setStatus('Start');
+        $historyRecord->setFileName($filePath)->setStatus('Started')->setDescription('Started');
+        EntityManager::persist($historyRecord);
+        EntityManager::flush();
 
         if (!$filePath) {
-            $this->warn('File was not found. The domains database was not updated');
+            Log::error('File was not found. The domains database was not updated');
             return false;
         }
 
-        $this->info('Start parsing file ' . $filePath);
+        Log::info('Start parsing file ' . $filePath);
         $domainsParsed = $this->parser->parse($filePath);
 
         if ($domainsParsed) {
-            $this->info($domainsParsed . ' domains have been parsed. Saving them to DB...');
+            Log::info(count($domainsParsed) . ' domains have been parsed. Saving them to DB...');
+
+            DB::table('domains')->truncate();
             $this->saveToDB($domainsParsed);
+
+            $historyRecord->setStatus('Finished');
+            $historyRecord->setDescription(count($domainsParsed) . ' domains has been exported');
+
+            EntityManager::persist($historyRecord);
+            EntityManager::flush();
+
+            Log::info('Saved successfully');
         }
+
+        return true;
     }
 
     /**
@@ -95,7 +111,7 @@ class ExportDomainsPool extends Command
             $domainEntity = $this->domainManager->createFromArray($domain);
             EntityManager::persist($domainEntity);
 
-            if (($i % $this->batchSize) == 0) {
+            if (($progress % $this->batchSize) == 0) {
                 EntityManager::flush();
                 EntityManager::clear();
             }

@@ -109,6 +109,7 @@ class ExportDomainsPool extends Command
             $bar->advance();
 
             $domainEntity = $this->domainManager->createFromArray($domain);
+            Log::info('Saved ' . $domainEntity->getName() . ' ' . date_format($domainEntity->getCreatedAt(), 'Y-m-d H:i:s'));
             EntityManager::persist($domainEntity);
 
             if (($progress % $this->batchSize) == 0) {

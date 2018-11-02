@@ -8,6 +8,10 @@ use App\Repository\DoctrineDomainRepository;
 use App\Repository\DomainRepository;
 use App\Repository\HistoryRepository;
 use EntityManager;
+use Illuminate\Queue\Events\JobProcessed;
+use Illuminate\Queue\Events\JobProcessing;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -19,7 +23,13 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //
+        Queue::before(function (JobProcessing $event) {
+            Log::info('Start processing job' . $event->job->getJobId() . ' ...');
+        });
+
+        Queue::after(function (JobProcessed $event) {
+            Log::info('Job ' . $event->job->getName() . ' processed');
+        });
     }
 
     /**

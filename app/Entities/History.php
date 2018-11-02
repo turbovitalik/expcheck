@@ -10,6 +10,10 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class History
 {
+    const STATUS_SCHEDULED = 1;
+    const STATUS_IN_PROGRESS = 2;
+    const STATUS_DONE = 3;
+
     /**
      * @var int
      * @ORM\Id
@@ -20,7 +24,7 @@ class History
 
     /**
      * @var string
-     * @ORM\Column(type="string")
+     * @ORM\Column(type="string", nullable=true)
      */
     protected $fileName;
 
@@ -41,6 +45,12 @@ class History
      * @ORM\Column(type="text", nullable=true)
      */
     protected $description;
+
+    /**
+     * @var string
+     * @ORM\Column(type="string", nullable=true)
+     */
+    protected $jobId;
 
     /**
      * History constructor.
@@ -125,11 +135,45 @@ class History
 
     /**
      * @param string $description
+     * @return $this
      */
     public function setDescription(string $description)
     {
         $this->description = $description;
 
         return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getJobId()
+    {
+        return $this->jobId;
+    }
+
+    /**
+     * @param string $jobId
+     */
+    public function setJobId(string $jobId)
+    {
+        $this->jobId = $jobId;
+
+        return $this;
+    }
+
+    /**
+     * @param $code
+     * @return mixed|string
+     */
+    public function getStatusName($code)
+    {
+        $statusMap = [
+            self::STATUS_SCHEDULED => 'scheduled',
+            self::STATUS_IN_PROGRESS => 'in progress',
+            self::STATUS_DONE => 'done',
+        ];
+
+        return array_key_exists($code, $statusMap) ? $statusMap[$code] : 'Status undefined';
     }
 }

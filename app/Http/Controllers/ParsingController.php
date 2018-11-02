@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Entities\History;
 use App\Repository\HistoryRepository;
 use App\Utils\DomainsFileParser;
 use Illuminate\Support\Facades\Artisan;
+use LaravelDoctrine\ORM\Facades\EntityManager;
 
 class ParsingController extends Controller
 {
@@ -12,17 +14,20 @@ class ParsingController extends Controller
     {
         $fileName = $fileParser->findPoolFile('pool_downloads', new \DateTime());
 
-        $history = $historyRepository->findAll();
+        $history = $historyRepository->findBy([], ['createdAt' => 'DESC']);
 
         return view('parsing.info', ['fileName' => $fileName, 'history' => $history]);
     }
 
     public function start()
     {
-        Artisan::call('pool:export', []);
+        Artisan::queue('pool:export', [])->onConnection('redis');
 
-        $status = Artisan::output() ? 'Success' : 'Failure! Something went wrong';
+        $historyRecord = new History();
+        $historyRecord->setStatus('Scheduled')->setDescription('Job has been scheduled to be performed in background');
+        EntityManager::persist($historyRecord);
+        EntityManager::flush();
 
-        return redirect()->action('ParsingController@info')->with('status', $status);
+        return redirect()->action('ParsingController@info')->with('status', 'Export has been scheduled');
     }
 }

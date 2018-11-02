@@ -4,7 +4,7 @@ namespace App\Console\Commands;
 
 use App\Entities\History;
 use App\Manager\DomainNameManager;
-use App\Repository\DomainRepository;
+use App\Manager\HistoryManager;
 use App\Utils\DomainsFileParser;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
@@ -38,37 +38,39 @@ class ExportDomainsPool extends Command
     protected $domainManager;
 
     /**
+     * @var HistoryManager
+     */
+    protected $historyManager;
+
+    /**
      * @var int
      */
     protected $batchSize = 500;
 
     /**
-     * Create a new command instance.
-     *
+     * ExportDomainsPool constructor.
      * @param DomainsFileParser $parser
-     * @param DomainRepository $domainRepository
      * @param DomainNameManager $domainManager
+     * @param HistoryManager $historyManager
      */
-    public function __construct(DomainsFileParser $parser, DomainNameManager $domainManager)
+    public function __construct(DomainsFileParser $parser, DomainNameManager $domainManager, HistoryManager $historyManager)
     {
         parent::__construct();
         $this->parser = $parser;
         $this->domainManager = $domainManager;
+        $this->historyManager = $historyManager;
     }
 
     /**
-     * Execute the console command.
-     *
-     * @return mixed
+     * @return bool
+     * @throws \Doctrine\ORM\OptimisticLockException
      */
     public function handle()
     {
         $filePath = $this->parser->findPoolFile('pool_downloads', new \DateTime());
 
-        $historyRecord = new History();
-        $historyRecord->setFileName($filePath)->setStatus('Started')->setDescription('Started');
-        EntityManager::persist($historyRecord);
-        EntityManager::flush();
+        $historyRecord = $this->historyManager->createHistoryRecord($filePath, History::STATUS_IN_PROGRESS, 'Export has been started');
+        $this->historyManager->save($historyRecord);
 
         if (!$filePath) {
             Log::error('File was not found. The domains database was not updated');
@@ -84,10 +86,11 @@ class ExportDomainsPool extends Command
             DB::table('domains')->truncate();
             $this->saveToDB($domainsParsed);
 
-            $historyRecord->setStatus('Finished');
+            $historyRecord->setStatus(History::STATUS_DONE);
             $historyRecord->setDescription(count($domainsParsed) . ' domains has been exported');
 
-            EntityManager::persist($historyRecord);
+            //todo: move this to another place
+            EntityManager::merge($historyRecord);
             EntityManager::flush();
 
             Log::info('Saved successfully');
@@ -97,7 +100,9 @@ class ExportDomainsPool extends Command
     }
 
     /**
-     * @param $domains array
+     * @param $domains
+     * @throws \Doctrine\Common\Persistence\Mapping\MappingException
+     * @throws \Doctrine\ORM\OptimisticLockException
      */
     public function saveToDB($domains)
     {

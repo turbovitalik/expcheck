@@ -13,8 +13,6 @@
                                 {{ session('status') }}
                             </div>
                         @endif
-
-                        <a href="{{ route('domain_upload_form') }}" class="btn btn-primary">Upload Domains</a><br><br>
                         <table class="table">
                             <thead>
                                 <th>#</th>

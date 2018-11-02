@@ -59,7 +59,7 @@ class DomainName
     /**
      * @param string $name
      */
-    public function setName($name): void
+    public function setName($name)
     {
         $this->name = $name;
     }
@@ -75,7 +75,7 @@ class DomainName
     /**
      * @param \DateTime $expiresAt
      */
-    public function setExpiresAt(\DateTime $expiresAt): void
+    public function setExpiresAt(\DateTime $expiresAt)
     {
         $this->expiresAt = $expiresAt;
     }
@@ -91,7 +91,7 @@ class DomainName
     /**
      * @param \DateTime $createdAt
      */
-    public function setCreatedAt($createdAt): void
+    public function setCreatedAt($createdAt)
     {
         $this->createdAt = $createdAt;
     }

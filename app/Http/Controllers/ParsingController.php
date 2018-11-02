@@ -23,11 +23,6 @@ class ParsingController extends Controller
     {
         Artisan::queue('pool:export', [])->onConnection('redis');
 
-        $historyRecord = new History();
-        $historyRecord->setStatus('Scheduled')->setDescription('Job has been scheduled to be performed in background');
-        EntityManager::persist($historyRecord);
-        EntityManager::flush();
-
         return redirect()->action('ParsingController@info')->with('status', 'Export has been scheduled');
     }
 }

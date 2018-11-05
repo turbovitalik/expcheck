@@ -10,6 +10,9 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class DomainName
 {
+    const SOURCE_POOL = 1;
+    const SOURCE_EDNET = 2;
+
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
@@ -31,6 +34,12 @@ class DomainName
      * @ORM\Column(type="datetime", nullable=true)
      */
     protected $createdAt;
+
+    /**
+     * @var int
+     * @ORM\Column(type="string", nullable=true)
+     */
+    protected $source;
 
     /**
      * DomainName constructor
@@ -94,5 +103,21 @@ class DomainName
     public function setCreatedAt($createdAt)
     {
         $this->createdAt = $createdAt;
+    }
+
+    /**
+     * @return int
+     */
+    public function getSource()
+    {
+        return $this->source;
+    }
+
+    /**
+     * @param int $source
+     */
+    public function setSource($source)
+    {
+        $this->source = $source;
     }
 }

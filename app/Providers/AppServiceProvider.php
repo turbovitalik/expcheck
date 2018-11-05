@@ -54,5 +54,10 @@ class AppServiceProvider extends ServiceProvider
                 EntityManager::getRepository(History::class)
             );
         });
+
+        $this->app->bind(
+            'GuzzleHttp\ClientInterface',
+            'GuzzleHttp\Client'
+        );
     }
 }

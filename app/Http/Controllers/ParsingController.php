@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Entities\History;
 use App\Repository\HistoryRepository;
+use App\Utils\DomainsDataGrabber;
 use App\Utils\DomainsFileParser;
 use Illuminate\Support\Facades\Artisan;
-use LaravelDoctrine\ORM\Facades\EntityManager;
+use Symfony\Component\DomCrawler\Crawler;
 
 class ParsingController extends Controller
 {
@@ -24,5 +24,14 @@ class ParsingController extends Controller
         Artisan::queue('pool:export', [])->onConnection('redis');
 
         return redirect()->action('ParsingController@info')->with('status', 'Export has been scheduled');
+    }
+
+    public function grab(DomainsDataGrabber $grabber)
+    {
+        $url = 'https://www.expireddomains.net/godaddy-closeout-domains/?start=25';
+        $content = $grabber->getData($url);
+
+        $grabber->parsePage($content);
+
     }
 }

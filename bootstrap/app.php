@@ -12,6 +12,7 @@
 */
 
 ini_set('max_execution_time', 0);
+ini_set('xdebug.var_display_max_data', 5400);
 
 $app = new Illuminate\Foundation\Application(
     realpath(__DIR__.'/../')

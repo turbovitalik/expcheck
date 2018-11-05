@@ -29,4 +29,5 @@ Route::get('/upload', 'UploadController@upload');
 
 Route::get('/parsing/info', 'ParsingController@info')->name('parsing_info');
 Route::get('/parsing/start', 'ParsingController@start')->name('parsing_start');
+Route::get('/parsing/grab', 'ParsingController@grab')->name('grab_from_site');
 

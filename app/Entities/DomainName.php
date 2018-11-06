@@ -21,7 +21,7 @@ class DomainName
     protected $id;
 
     /**
-     * @ORM\Column(type="string")
+     * @ORM\Column(type="string", unique=true)
      */
     protected $name;
 
@@ -42,10 +42,12 @@ class DomainName
     protected $source;
 
     /**
-     * DomainName constructor
+     * DomainName constructor.
+     * @param $name string
      */
-    public function __construct()
+    public function __construct($name)
     {
+        $this->name = $name;
         $this->createdAt = new \DateTime();
     }
 

@@ -100,20 +100,25 @@ class ExportDomainsPool extends Command
     }
 
     /**
+     * todo: cover this with tests
      * @param $domains
      * @throws \Doctrine\Common\Persistence\Mapping\MappingException
      * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws \Exception
      */
     public function saveToDB($domains)
     {
         $progress = 0;
         $bar = $this->output->createProgressBar(count($domains));
 
-        foreach ($domains as $domain) {
+        foreach ($domains as $domainData) {
             $progress++;
             $bar->advance();
 
-            $domainEntity = $this->domainManager->createFromArray($domain);
+            $domainName = $domainData['name'];
+            unset($domainData['name']);
+            $domainEntity = $this->domainManager->createFromArray($domainName, $domainData);
+
             Log::info('Saved ' . $domainEntity->getName() . ' ' . date_format($domainEntity->getCreatedAt(), 'Y-m-d H:i:s'));
             EntityManager::persist($domainEntity);
 

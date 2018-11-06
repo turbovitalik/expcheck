@@ -3,35 +3,27 @@
 namespace App\Manager;
 
 use App\Entities\DomainName;
-use App\Repository\DomainRepository;
+use http\Exception\InvalidArgumentException;
 use LaravelDoctrine\ORM\Facades\EntityManager;
 
 class DomainNameManager
 {
     /**
-     * @var DomainRepository
-     */
-    private $domainRepository;
-
-    /**
-     * DomainNameManager constructor.
-     * @param DomainRepository $domainRepository
-     */
-    public function __construct(DomainRepository $domainRepository)
-    {
-        $this->domainRepository = $domainRepository;
-    }
-
-    /**
-     * @param $arrayData array
+     * @param $name
+     * @param array $attr
      * @return DomainName
+     * @throws \Exception
      */
-    public function createFromArray($arrayData)
+    public function createFromArray(string $name, $attr = [])
     {
-        $domain = new DomainName();
+        $domain = new DomainName($name);
 
-        $domain->setName($arrayData['name']);
-        $domain->setExpiresAt($arrayData['expiresAt']);
+        foreach ($attr as $key => $value) {
+            $setter = 'set' . ucfirst($key);
+            if (method_exists($domain, $setter)) {
+                $domain->{$setter}($value);
+            }
+        }
 
         return $domain;
     }

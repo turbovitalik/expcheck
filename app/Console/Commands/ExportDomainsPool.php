@@ -3,11 +3,8 @@
 namespace App\Console\Commands;
 
 use App\DomainName;
-use App\Entities\History;
 use App\Events\PoolExport\BeforeParse;
 use App\Events\PoolExport\ExportSuccess;
-use App\Manager\DomainNameManager;
-use App\Manager\HistoryManager;
 use App\Utils\DomainsFileParser;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
@@ -36,16 +33,6 @@ class ExportDomainsPool extends Command
     protected $parser;
 
     /**
-     * @var DomainNameManager
-     */
-    protected $domainManager;
-
-    /**
-     * @var HistoryManager
-     */
-    protected $historyManager;
-
-    /**
      * @var int
      */
     protected $batchSize = 500;
@@ -58,15 +45,11 @@ class ExportDomainsPool extends Command
     /**
      * ExportDomainsPool constructor.
      * @param DomainsFileParser $parser
-     * @param DomainNameManager $domainManager
-     * @param HistoryManager $historyManager
      */
-    public function __construct(DomainsFileParser $parser, DomainNameManager $domainManager, HistoryManager $historyManager)
+    public function __construct(DomainsFileParser $parser)
     {
         parent::__construct();
         $this->parser = $parser;
-        $this->domainManager = $domainManager;
-        $this->historyManager = $historyManager;
     }
 
     /**

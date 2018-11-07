@@ -2,7 +2,6 @@
 
 namespace App\Utils;
 
-use App\Manager\DomainNameManager;
 use GuzzleHttp\ClientInterface;
 use Illuminate\Support\Facades\Cache;
 use Symfony\Component\DomCrawler\Crawler;
@@ -24,21 +23,15 @@ class DomainsDataGrabber
     protected $crawler;
 
     /**
-     * @var DomainNameManager
-     */
-    protected $nameManager;
-
-    /**
      * DomainsDataGrabber constructor.
      * @param ClientInterface $guzzleClient
      * @param Crawler $crawler
      * @param DomainNameManager $domainNameManager
      */
-    public function __construct(ClientInterface $guzzleClient, Crawler $crawler, DomainNameManager $domainNameManager)
+    public function __construct(ClientInterface $guzzleClient, Crawler $crawler)
     {
         $this->guzzleClient = $guzzleClient;
         $this->crawler = $crawler;
-        $this->nameManager = $domainNameManager;
     }
 
     public function getData($url)

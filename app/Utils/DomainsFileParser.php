@@ -62,7 +62,7 @@ class DomainsFileParser
 
         $domainData = [
             'name' => $parts[0],
-            'expiresAt' => $this->parseExpiration($parts[1]),
+            'expires_at' => $this->parseExpiration($parts[1]),
         ];
 
         return $domainData;

@@ -23,18 +23,18 @@
                             <tbody>
                             @foreach ($domains as $domain)
                                 <tr>
-                                    <td>{{ $domain->getId() }}</td>
-                                    <td>{{ $domain->getName() }}</td>
+                                    <td>{{ $domain->id }}</td>
+                                    <td>{{ $domain->name }}</td>
 
                                     <td>
-                                        @if ($domain->getExpiresAt())
-                                            {{ date_format($domain->getExpiresAt(), 'd-m-Y H:i:s') }}
+                                        @if ($domain->expires_at)
+                                            {{ date_format($domain->expires_at, 'd-m-Y H:i:s') }}
                                         @else
                                             {{ __('Undefined') }}
                                         @endif
                                     </td>
                                     <td>
-                                        {{ date_format($domain->getCreatedAt(), 'd-m-Y H:i:s') }}
+                                        {{ date_format($domain->created_at, 'd-m-Y H:i:s') }}
                                     </td>
                                 </tr>
                             @endforeach

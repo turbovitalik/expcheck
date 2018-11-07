@@ -43,18 +43,6 @@ class AppServiceProvider extends ServiceProvider
             $this->app->register(\Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class);
         }
 
-        $this->app->bind(DomainRepository::class, function($app) {
-           return new DoctrineDomainRepository(
-               EntityManager::getRepository(DomainName::class), $app['em']
-           );
-        });
-
-        $this->app->bind(HistoryRepository::class, function($app) {
-            return new HistoryRepository(
-                EntityManager::getRepository(History::class)
-            );
-        });
-
         $this->app->bind(
             'GuzzleHttp\ClientInterface',
             'GuzzleHttp\Client'

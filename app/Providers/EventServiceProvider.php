@@ -18,6 +18,12 @@ class EventServiceProvider extends ServiceProvider
         Registered::class => [
             SendEmailVerificationNotification::class,
         ],
+        'App\Events\PoolExport\BeforeParse' => [
+            'App\Listeners\CreateStartMarker',
+        ],
+        'App\Events\PoolExport\ExportSuccess' => [
+            'App\Listeners\UpdateHistoryMarker',
+        ],
     ];
 
     /**

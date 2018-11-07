@@ -2,7 +2,10 @@
 
 namespace App\Console\Commands;
 
+use App\DomainName;
 use App\Entities\History;
+use App\Events\PoolExport\BeforeParse;
+use App\Events\PoolExport\ExportSuccess;
 use App\Manager\DomainNameManager;
 use App\Manager\HistoryManager;
 use App\Utils\DomainsFileParser;
@@ -48,6 +51,11 @@ class ExportDomainsPool extends Command
     protected $batchSize = 500;
 
     /**
+     * @var integer
+     */
+    protected $timestamp;
+
+    /**
      * ExportDomainsPool constructor.
      * @param DomainsFileParser $parser
      * @param DomainNameManager $domainManager
@@ -67,33 +75,22 @@ class ExportDomainsPool extends Command
      */
     public function handle()
     {
+        $this->setTimestamp();
         $filePath = $this->parser->findPoolFile('pool_downloads', new \DateTime());
 
-        $historyRecord = $this->historyManager->createHistoryRecord($filePath, History::STATUS_IN_PROGRESS, 'Export has been started');
-        $this->historyManager->save($historyRecord);
+        event(new BeforeParse($filePath, $this));
 
         if (!$filePath) {
             Log::error('File was not found. The domains database was not updated');
             return false;
         }
 
-        Log::info('Start parsing file ' . $filePath);
         $domainsParsed = $this->parser->parse($filePath);
 
         if ($domainsParsed) {
-            Log::info(count($domainsParsed) . ' domains have been parsed. Saving them to DB...');
-
             DB::table('domains')->truncate();
             $this->saveToDB($domainsParsed);
-
-            $historyRecord->setStatus(History::STATUS_DONE);
-            $historyRecord->setDescription(count($domainsParsed) . ' domains has been exported');
-
-            //todo: move this to another place
-            EntityManager::merge($historyRecord);
-            EntityManager::flush();
-
-            Log::info('Saved successfully');
+            event(new ExportSuccess($domainsParsed, $this));
         }
 
         return true;
@@ -115,22 +112,33 @@ class ExportDomainsPool extends Command
             $progress++;
             $bar->advance();
 
-            $domainName = $domainData['name'];
-            unset($domainData['name']);
-            $domainEntity = $this->domainManager->createFromArray($domainName, $domainData);
+            $domainData['source'] = DomainName::SOURCE_POOL;
+            $domainData['created_at'] = new \DateTime();
+            $domainName = new DomainName($domainData);
 
-            Log::info('Saved ' . $domainEntity->getName() . ' ' . date_format($domainEntity->getCreatedAt(), 'Y-m-d H:i:s'));
-            EntityManager::persist($domainEntity);
+            Log::info('Saved ' . $domainName->name . ' ' . date_format($domainName->created_at, 'Y-m-d H:i:s'));
+
+            $insertData[] = $domainData;
 
             if (($progress % $this->batchSize) == 0) {
-                EntityManager::flush();
-                EntityManager::clear();
+                unset($insertData);
             }
         }
 
-        EntityManager::flush();
-        EntityManager::clear();
-
+        DomainName::insert($insertData);
         $bar->finish();
+    }
+
+    public function setTimestamp()
+    {
+        $this->timestamp = time();
+    }
+
+    /**
+     * @return integer
+     */
+    public function getTimestamp()
+    {
+        return $this->timestamp;
     }
 }

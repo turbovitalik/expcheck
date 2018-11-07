@@ -34,18 +34,18 @@
                             <tbody>
                                 @foreach ($history as $record)
                                     <tr>
-                                        <td>{{ date_format($record->getCreatedAt(), 'Y-m-d H:i:s') }}</td>
+                                        <td>{{ date_format($record->created_at, 'Y-m-d H:i:s') }}</td>
                                         <td>
-                                            @if ($record->getFileName())
-                                                {{ $record->getFileName() }}
+                                            @if ($record->file_name)
+                                                {{ $record->file_name }}
                                             @endif
                                         </td>
                                         <td>
-                                            @if ($record->getStatus())
-                                                {{ $record->getStatusName($record->getStatus()) }}
+                                            @if ($record->status)
+                                                {{ $record->status }}
                                             @endif
                                         </td>
-                                        <td>{{ $record->getDescription() }}</td>
+                                        <td>{{ $record->description }}</td>
                                     </tr>
                                 @endforeach
                             </tbody>

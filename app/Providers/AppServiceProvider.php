@@ -7,7 +7,9 @@ use App\Entities\History;
 use App\Repository\DoctrineDomainRepository;
 use App\Repository\DomainRepository;
 use App\Repository\HistoryRepository;
+use App\Service\MajesticService;
 use EntityManager;
+use GuzzleHttp\Client;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Queue\Events\JobProcessing;
 use Illuminate\Support\Facades\Log;
@@ -47,5 +49,16 @@ class AppServiceProvider extends ServiceProvider
             'GuzzleHttp\ClientInterface',
             'GuzzleHttp\Client'
         );
+
+        $this->app->when(Client::class)
+            ->needs('$config')
+            ->give([
+                'base_uri' => MajesticService::SERVICE_HOST,
+                'timeout' => 50,
+            ]);
+
+        $this->app->when(MajesticService::class)
+            ->needs('$apiKey')
+            ->give('98806EB31D265C317F6C773D4BB9105B');
     }
 }

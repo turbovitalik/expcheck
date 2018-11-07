@@ -19,7 +19,7 @@ Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');
 
-Route::get('/domains', 'DomainController@list')->name('domains_list');
+Route::get('/domains', 'DomainController@index')->name('domains_list');
 Route::get('/domains/add', 'DomainController@add')->name('domain_add');
 Route::post('/domains/store', 'DomainController@store')->name('domain_store');
 Route::get('/domains/upload', 'DomainController@upload')->name('domain_upload_form');

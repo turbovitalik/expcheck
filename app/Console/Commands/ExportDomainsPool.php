@@ -9,7 +9,6 @@ use App\Utils\DomainsFileParser;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use LaravelDoctrine\ORM\Facades\EntityManager;
 
 class ExportDomainsPool extends Command
 {
@@ -97,6 +96,7 @@ class ExportDomainsPool extends Command
 
             $domainData['source'] = DomainName::SOURCE_POOL;
             $domainData['created_at'] = new \DateTime();
+            $domainData['tld'] = $this->getTld($domainData['name']);
             $domainName = new DomainName($domainData);
 
             Log::info('Saved ' . $domainName->name . ' ' . date_format($domainName->created_at, 'Y-m-d H:i:s'));
@@ -123,5 +123,12 @@ class ExportDomainsPool extends Command
     public function getTimestamp()
     {
         return $this->timestamp;
+    }
+
+    public function getTld($name)
+    {
+        $nameParts = explode('.', $name);
+
+        return end($nameParts);
     }
 }

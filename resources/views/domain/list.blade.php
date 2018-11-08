@@ -71,7 +71,13 @@
                                     </td>
                                     <td>{{ !is_null($domain->trust_flow) ? $domain->trust_flow : 'Undefined' }}</td>
                                     <td>{{ !is_null($domain->citation_flow) ? $domain->citation_flow : 'Undefined' }}</td>
-                                    <td>{{ date_format($domain->updated_at, 'd-m-Y H:i:s') }}</td>
+                                    <td>
+                                        @if ($domain->updated_at)
+                                            {{ date_format($domain->updated_at, 'd-m-Y H:i:s') }}
+                                        @else
+                                            {{ __('Undefined') }}
+                                        @endif
+                                    </td>
                                 </tr>
                             @endforeach
                             </tbody>

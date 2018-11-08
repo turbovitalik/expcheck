@@ -17,7 +17,7 @@ class ExportDomainsPool extends Command
      *
      * @var string
      */
-    protected $signature = 'pool:export';
+    protected $signature = 'pool:export {limit?}';
 
     /**
      * The console command description.
@@ -58,6 +58,9 @@ class ExportDomainsPool extends Command
     public function handle()
     {
         $this->setTimestamp();
+
+        $limit = $this->argument('limit');
+
         $filePath = $this->parser->findPoolFile('pool_downloads', new \DateTime());
 
         event(new BeforeParse($filePath, $this));
@@ -71,7 +74,7 @@ class ExportDomainsPool extends Command
 
         if ($domainsParsed) {
             DB::table('domains')->truncate();
-            $this->saveToDB($domainsParsed);
+            $this->saveToDB($domainsParsed, $limit);
             event(new ExportSuccess($domainsParsed, $this));
         }
 
@@ -85,8 +88,12 @@ class ExportDomainsPool extends Command
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \Exception
      */
-    public function saveToDB($domains)
+    public function saveToDB($domains, $limit = null)
     {
+        if ($limit) {
+            $domains = array_slice($domains, 0, $limit);
+        }
+
         $progress = 0;
         $bar = $this->output->createProgressBar(count($domains));
 
@@ -96,6 +103,7 @@ class ExportDomainsPool extends Command
 
             $domainData['source'] = DomainName::SOURCE_POOL;
             $domainData['created_at'] = new \DateTime();
+            $domainData['updated_at'] = new \DateTime();
             $domainData['tld'] = $this->getTld($domainData['name']);
             $domainName = new DomainName($domainData);
 
@@ -104,11 +112,15 @@ class ExportDomainsPool extends Command
             $insertData[] = $domainData;
 
             if (($progress % $this->batchSize) == 0) {
+                DomainName::insert($insertData);
                 unset($insertData);
             }
         }
 
-        DomainName::insert($insertData);
+        if (isset($insertData)){
+            DomainName::insert($insertData);
+        }
+
         $bar->finish();
     }
 

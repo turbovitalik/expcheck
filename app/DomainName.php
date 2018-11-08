@@ -34,7 +34,12 @@ class DomainName extends Model
     /**
      * @var array
      */
-    protected $fillable = ['name', 'created_at', 'trust_flow', 'citation_flow', 'tld'];
+    protected $fillable = ['name', 'created_at', 'expires_at', 'updated_at', 'trust_flow', 'citation_flow', 'tld'];
+
+    /**
+     * @var bool
+     */
+    public $timestamps = true;
 
     /**
      * @var array

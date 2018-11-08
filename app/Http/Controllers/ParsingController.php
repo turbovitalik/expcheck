@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\DomainName;
 use App\PoolImportHistory;
-use App\Utils\DomainsDataGrabber;
+use App\Service\MajesticService;
 use App\Utils\DomainsFileParser;
 use Illuminate\Support\Facades\Artisan;
 
@@ -26,11 +27,12 @@ class ParsingController extends Controller
         return redirect()->action('ParsingController@info')->with('status', 'Export has been scheduled');
     }
 
-    public function grab(DomainsDataGrabber $grabber)
+    public function grab(MajesticService $majesticService)
     {
-        $url = 'https://www.expireddomains.net/godaddy-closeout-domains/?start=25';
-        $content = $grabber->getData($url);
+        $links = DomainName::limit(100)
+            ->get();
 
-        $domains = $grabber->parsePage($content);
+        $majesticService->updateMajesticStats($links);
+
     }
 }

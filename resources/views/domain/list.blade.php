@@ -3,7 +3,7 @@
 @section('content')
     <div class="container">
         <div class="row justify-content-center">
-            <div class="col-md-8">
+            <div class="col-md-12">
                 <div class="card">
                     <div class="card-body">
                         <form method="get">
@@ -51,6 +51,7 @@
                                 <th>Parsed</th>
                                 <th>Trust Flow</th>
                                 <th>Citation Flow</th>
+                                <th>Updated</th>
                             </thead>
                             <tbody>
                             @foreach ($domains as $domain)
@@ -68,8 +69,9 @@
                                     <td>
                                         {{ date_format($domain->created_at, 'd-m-Y H:i:s') }}
                                     </td>
-                                    <td>{{ $domain->trust_flow }}</td>
-                                    <td>{{ $domain->citation_flow }}</td>
+                                    <td>{{ !is_null($domain->trust_flow) ? $domain->trust_flow : 'Undefined' }}</td>
+                                    <td>{{ !is_null($domain->citation_flow) ? $domain->citation_flow : 'Undefined' }}</td>
+                                    <td>{{ date_format($domain->updated_at, 'd-m-Y H:i:s') }}</td>
                                 </tr>
                             @endforeach
                             </tbody>

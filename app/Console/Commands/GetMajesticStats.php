@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\DomainName;
+use App\Jobs\MajesticRequest;
 use App\Service\MajesticService;
 use Illuminate\Console\Command;
 
@@ -39,22 +40,10 @@ class GetMajesticStats extends Command
      */
     public function handle(MajesticService $majecticService)
     {
-        $domains = DomainName::where(['trust_flow' => null])
+        DomainName::where(['trust_flow' => null])
             ->orWhere(['citation_flow' => null])
-            ->limit(10)
-            ->get();
-
-        foreach ($domains as $domain) {
-            if (!$domain->trust_flow) {
-                $trustFlow = $majecticService->getTrustFlow($domain->name);
-                $domain->update(['trust_flow' => $trustFlow]);
-            }
-            if (!$domain->citationFlow) {
-                $citationFlow = $majecticService->getCitationFlow($domain->name);
-                $domain->update(['citation_flow' => $citationFlow]);
-            }
-
-            echo 'URL:' . $domain->name . ' TRUST:' . $trustFlow . ' CIT:' . $citationFlow . "\n\n";
-        }
+            ->chunk(100, function($domains) {
+                MajesticRequest::dispatch($domains)->onConnection('redis');
+            });
     }
 }

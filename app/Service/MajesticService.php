@@ -2,8 +2,11 @@
 
 namespace App\Service;
 
+use App\DomainName;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\BadResponseException;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Request;
 
 class MajesticService
@@ -55,6 +58,38 @@ class MajesticService
                 'datasource' => 'fresh',
             ]
         ];
+
+        try {
+            $response = $this->client->request(Request::METHOD_GET, self::SERVICE_URI, $options);
+        } catch (BadResponseException $e) {
+            $response = $e->getResponse();
+        }
+
+        $content = $response->getBody()->getContents();
+
+        return json_decode($content, true);
+    }
+
+    public function getBulkUrlInfo(Collection $domains)
+    {
+        $itemsCount = count($domains);
+
+        $itemsArray = [];
+        $i = 0;
+
+        foreach ($domains as $domain) {
+            $itemsArray['item' . $i] = $domain->name;
+            $i++;
+        }
+
+        $queryParams = [
+            'app_api_key' => $this->apiKey,
+            'cmd' => self::COMMAND,
+            'items' => $itemsCount,
+            'datasource' => 'fresh',
+        ];
+
+        $options = ['query' => array_merge($queryParams, $itemsArray)];
 
         try {
             $response = $this->client->request(Request::METHOD_GET, self::SERVICE_URI, $options);
@@ -222,5 +257,21 @@ class MajesticService
         }
 
         return 0;
+    }
+
+    public function updateMajesticStats(Collection $links)
+    {
+        $response = $this->getBulkUrlInfo($links);
+
+        $data = $response['DataTables']['Results']['Data'];
+
+        Log::info($data);
+
+        foreach ($data as $item) {
+            Log::info('Saving stats for ' . $item['Item']);
+            DomainName::where(['name' => $item['Item']])
+                ->update(['trust_flow' => $item['TrustFlow'], 'citation_flow' => $item['CitationFlow']]);
+        }
+
     }
 }

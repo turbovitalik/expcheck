@@ -6,6 +6,7 @@
             <div class="col-md-12">
                 <div class="card">
                     <div class="card-body">
+                        <p>Undefined: {{ $undefined }}</p>
                         <form method="get">
                             <div class="form-group">
                                 <label class="col-form-label" for="trust_flow">{{ __('Trust flow') }}</label>

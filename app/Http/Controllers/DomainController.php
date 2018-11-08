@@ -40,9 +40,15 @@ class DomainController extends Controller
             ->groupBy('tld')
             ->get();
 
+        $undefined = DB::table('domains')
+            ->where(['trust_flow' => null])
+            ->orWhere(['citation_flow' => null])
+            ->count();
+
         return view('domain.list', [
             'domains' => $domains,
             'tlds' => $tlds,
+            'undefined' => $undefined,
         ]);
     }
 }

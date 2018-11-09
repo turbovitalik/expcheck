@@ -38,7 +38,7 @@ class GetMajesticStats extends Command
      *
      * @return mixed
      */
-    public function handle(MajesticService $majecticService)
+    public function handle()
     {
         DomainName::where(['trust_flow' => null])
             ->orWhere(['citation_flow' => null])

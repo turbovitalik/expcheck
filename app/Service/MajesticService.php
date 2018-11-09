@@ -263,9 +263,12 @@ class MajesticService
     {
         $response = $this->getBulkUrlInfo($links);
 
-        $data = $response['DataTables']['Results']['Data'];
+        if (!isset($response['DataTables'])) {
+            Log::warning('Response structure is wrong: ' . $response);
+            return;
+        }
 
-        Log::info($data);
+        $data = $response['DataTables']['Results']['Data'];
 
         foreach ($data as $item) {
             Log::info('Saving stats for ' . $item['Item']);

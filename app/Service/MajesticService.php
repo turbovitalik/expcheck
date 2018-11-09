@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 class MajesticService
 {
-    const SERVICE_HOST = 'https://api.majestic.com';
+    const SERVICE_HOST = 'https://developer.majestic.com';
 
     const SERVICE_URI = '/api/json';
 

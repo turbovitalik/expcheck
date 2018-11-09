@@ -264,7 +264,7 @@ class MajesticService
         $response = $this->getBulkUrlInfo($links);
 
         if (!isset($response['DataTables'])) {
-            Log::warning('Response structure is wrong: ' . var_dump($response));
+            Log::warning('Response structure is wrong.' . $response['Code'] . ' ' . $response['ErrorMessage'] . ' ' . $response['FullError']);
             return;
         }
 

@@ -17,7 +17,7 @@ class ExportDomainsPool extends Command
      *
      * @var string
      */
-    protected $signature = 'pool:export {limit?}';
+    protected $signature = 'pool:export {limit?} {--fake}';
 
     /**
      * The console command description.
@@ -60,6 +60,7 @@ class ExportDomainsPool extends Command
         $this->setTimestamp();
 
         $limit = $this->argument('limit');
+        $isFake = $this->option('fake');
 
         $filePath = $this->parser->findPoolFile('pool_downloads', new \DateTime());
 
@@ -74,7 +75,7 @@ class ExportDomainsPool extends Command
 
         if ($domainsParsed) {
             DB::table('domains')->truncate();
-            $this->saveToDB($domainsParsed, $limit);
+            $this->saveToDB($domainsParsed, $limit, $isFake);
             event(new ExportSuccess($domainsParsed, $this));
         }
 
@@ -84,11 +85,10 @@ class ExportDomainsPool extends Command
     /**
      * todo: cover this with tests
      * @param $domains
-     * @throws \Doctrine\Common\Persistence\Mapping\MappingException
-     * @throws \Doctrine\ORM\OptimisticLockException
-     * @throws \Exception
+     * @param null $limit
+     * @param $isFake
      */
-    public function saveToDB($domains, $limit = null)
+    public function saveToDB($domains, $limit = null, $isFake = null)
     {
         if ($limit) {
             $domains = array_slice($domains, 0, $limit);
@@ -105,6 +105,11 @@ class ExportDomainsPool extends Command
             $domainData['created_at'] = new \DateTime();
             $domainData['updated_at'] = new \DateTime();
             $domainData['tld'] = $this->getTld($domainData['name']);
+            if ($isFake) {
+                $domainData['trust_flow'] = random_int(0, 30);
+                $domainData['citation_flow'] = random_int(0, 30);
+            }
+
             $domainName = new DomainName($domainData);
 
             Log::info('Saved ' . $domainName->name . ' ' . date_format($domainName->created_at, 'Y-m-d H:i:s'));

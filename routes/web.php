@@ -29,5 +29,8 @@ Route::get('/upload', 'UploadController@upload');
 
 Route::get('/parsing/info', 'ParsingController@info')->name('parsing_info');
 Route::get('/parsing/start', 'ParsingController@start')->name('parsing_start');
-Route::get('/parsing/grab', 'ParsingController@grab')->name('grab_from_site');
+
+Route::get('/majestic/tasks', 'MajesticController@index')->name('majestic_task_queue');
+Route::get('/majestic/chunk', 'MajesticController@getChunk')->name('get_majestic_chunk');
+Route::get('/majestic/all', 'MajesticController@getAll')->name('get_majestic_all');
 

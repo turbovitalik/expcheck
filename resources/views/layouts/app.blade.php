@@ -41,7 +41,7 @@
                         <!-- Authentication Links -->
                         @guest
                             <li class="nav-item">
-                                <a class="nav-link" href="{{ route('grab_from_site') }}">{{ __('Grab') }}</a>
+                                <a class="nav-link" href="{{ route('majestic_task_queue') }}">{{ __('Majestic Queue') }}: {{ $queueNumber }}</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" href="{{ route('domains_list') }}">{{ __('Domains') }}</a>

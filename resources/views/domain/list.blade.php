@@ -6,15 +6,33 @@
             <div class="col-md-12">
                 <div class="card">
                     <div class="card-body">
-                        <p>Undefined: {{ $undefined }}</p>
+                        <p>Undefined Majestic stats: {{ $undefined }}</p>
+                        <a href="{{ route('get_majestic_chunk') }}" class="btn btn-primary">{{ __('Get Majestic data (100 items)') }}</a>
+                        <a href="{{ route('get_majestic_all') }}" class="btn btn-success">{{ __('Get Majestic data (full)') }}</a>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-body">
                         <form method="get">
-                            <div class="form-group">
-                                <label class="col-form-label" for="trust_flow">{{ __('Trust flow') }}</label>
-                                <input class="form-control" id="trust_flow" name="trust_flow" type="text" value="{{ request('trust_flow') }}" />
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    <label class="col-form-label" for="trust_flow_min">{{ __('Trust flow (from):') }}</label>
+                                    <input class="form-control" id="trust_flow_min" name="trust_flow_min" type="text" value="{{ request('trust_flow_min') }}" />
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label class="col-form-label" for="trust_flow_max">{{ __('Trust flow (to):') }}</label>
+                                    <input class="form-control" id="trust_flow_max" name="trust_flow_max" type="text" value="{{ request('trust_flow_max') }}" />
+                                </div>
                             </div>
-                            <div class="form-group">
-                                <label class="col-form-label" for="citation_flow">{{ __('Citation flow') }}</label>
-                                <input class="form-control" id="citation_flow" name="citation_flow" type="text" value="{{ request('citation_flow') }}" />
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    <label class="col-form-label" for="citation_flow_min">{{ __('Citation flow (min)') }}</label>
+                                    <input class="form-control" id="citation_flow_min" name="citation_flow_min" type="text" value="{{ request('citation_flow_min') }}" />
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label class="col-form-label" for="citation_flow_max">{{ __('Citation flow (max)') }}</label>
+                                    <input class="form-control" id="citation_flow_max" name="citation_flow_max" type="text" value="{{ request('citation_flow_max') }}" />
+                                </div>
                             </div>
                             <div class="form-group">
                                 @foreach($tlds as $tld)
@@ -70,8 +88,8 @@
                                     <td>
                                         {{ date_format($domain->created_at, 'd-m-Y H:i:s') }}
                                     </td>
-                                    <td>{{ !is_null($domain->trust_flow) ? $domain->trust_flow : 'Undefined' }}</td>
-                                    <td>{{ !is_null($domain->citation_flow) ? $domain->citation_flow : 'Undefined' }}</td>
+                                    <td>{!! !is_null($domain->trust_flow) ? $domain->trust_flow : '<span class="bg-warning">Undefined</span>' !!}</td>
+                                    <td>{!! !is_null($domain->citation_flow) ? $domain->citation_flow : '<span class="bg-warning">Undefined</span>' !!}</td>
                                     <td>
                                         @if ($domain->updated_at)
                                             {{ date_format($domain->updated_at, 'd-m-Y H:i:s') }}

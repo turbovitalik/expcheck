@@ -14,7 +14,7 @@ class GetMajesticStats extends Command
      *
      * @var string
      */
-    protected $signature = 'majestic:stats';
+    protected $signature = 'majestic:stats {mode=test}';
 
     /**
      * The console command description.
@@ -40,6 +40,8 @@ class GetMajesticStats extends Command
      */
     public function handle()
     {
+        $mode = $this->argument('mode');
+
         DomainName::where(['trust_flow' => null])
             ->orWhere(['citation_flow' => null])
             ->chunk(100, function($domains) {

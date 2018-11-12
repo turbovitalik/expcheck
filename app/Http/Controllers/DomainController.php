@@ -12,12 +12,20 @@ class DomainController extends Controller
     {
         $domainName = $domainName->newQuery();
 
-        if (null !== $request->input('trust_flow')) {
-            $domainName->where(['trust_flow' => $request->input('trust_flow')]);
+        if (null !== $request->input('trust_flow_min')) {
+            $domainName->where('trust_flow', '>', $request->input('trust_flow_min'));
         }
 
-        if (null !== $request->input('citation_flow')) {
-            $domainName->where(['citation_flow' => $request->input('citation_flow')]);
+        if (null !== $request->input('trust_flow_max')) {
+            $domainName->where('trust_flow', '<', $request->input('trust_flow_max'));
+        }
+
+        if (null !== $request->input('citation_flow_min')) {
+            $domainName->where('citation_flow', '>', $request->input('citation_flow_min'));
+        }
+
+        if (null !== $request->input('citation_flow_max')) {
+            $domainName->where('citation_flow', '<', $request->input('citation_flow_max'));
         }
 
         if ($request->input('tld')) {
@@ -29,9 +37,11 @@ class DomainController extends Controller
             });
         }
 
-        $domains = $domainName->paginate(10)->appends([
-            'trust_flow' => $request->input('trust_flow'),
-            'citation_flow' => $request->input('citation_flow'),
+        $domains = $domainName->paginate(150)->appends([
+            'trust_flow_min' => $request->input('trust_flow_min'),
+            'trust_flow_max' => $request->input('trust_flow_max'),
+            'citation_flow_min' => $request->input('citation_flow_min'),
+            'citation_flow_max' => $request->input('citation_flow_max'),
             'tld' => $request->input('tld'),
         ]);
 
